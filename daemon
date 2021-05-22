@@ -1,0 +1,16 @@
+#!/bin/sh
+
+case $1 in
+    --install)
+        cp config/roku_bridge.conf /etc/
+        cp config/roku_bridge.service /etc/systemd/system/
+        systemctl enable --now roku_bridge.service
+    ;;
+    --uninstall)
+        systemctl disable --now roku_bridge.service
+        rm /etc/systemd/system/roku_bridge.service
+    ;;
+    *)
+        echo "No valid arguments. Allowed: --install, --uninstall"
+    ;;
+esac

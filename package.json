@@ -1,0 +1,21 @@
+{
+  "name": "roku_bridge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "bin": {
+    "roku_bridge": "app.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "daemon_install": "./daemon --install",
+    "daemon_uninstall": ".daemon --uninstall"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ini": "^2.0.0",
+    "mqtt": "^4.2.6"
+  }
+}

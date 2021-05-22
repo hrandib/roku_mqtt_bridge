@@ -1,0 +1,13 @@
+[Unit]
+Description=Roku ECP to MQTT brigde
+ConditionPathExists=/etc/roku_bridge.conf
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/roku_bridge
+PIDFile=/run/roku_bridge.pid
+RestartSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
