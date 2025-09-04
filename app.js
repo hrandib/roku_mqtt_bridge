@@ -6,6 +6,7 @@ const app = express();
 const port = 8060;
 
 const fs = require('fs');
+const path = require('path');
 const ini = require('ini');
 
 const systemConfigLocation = '/etc/roku_bridge.conf';
@@ -171,11 +172,33 @@ app.get('/query/device-info', (req, res) => {
 
 // Returns the icon for a specific application
 app.get('/query/icon/:appId', (req, res) => {
-    const appId = req.params.appId;
+    const { appId } = req.params;
     console.log(`Received request for /query/icon/${appId}`);
-    // This would typically serve an actual image file.
-    // For now, we'll send a 404 Not Found as we don't have icons.
-    res.status(404).send('Not Found');
+
+    // Basic validation to ensure appId is a number, preventing path traversal.
+    if (!/^\d+$/.test(appId)) {
+        return res.status(400).send('Invalid App ID format.');
+    }
+
+    // Construct the full, absolute path to the icon file.
+    // We assume the icon is a PNG file named after the app's ID.
+    const iconPath = path.resolve(__dirname, 'icons', `${appId}.png`);
+
+    // Check if the file exists. If not, send a 404.
+    if (!fs.existsSync(iconPath)) {
+        console.log(`Icon not found for app ID ${appId} at path: ${iconPath}`);
+        return res.status(404).send('Not Found');
+    }
+
+    // Use res.sendFile to serve the static image file.
+    // This handles setting the correct Content-Type and other headers.
+    res.sendFile(iconPath, (err) => {
+        if (err) {
+            console.error(`Error sending icon file for app ID ${appId}:`, err);
+        } else {
+            console.log(`Successfully sent icon for app ID ${appId}.`);
+        }
+    });
 });
 
 
