@@ -70,6 +70,7 @@ function getAppResponse(apps) {
 }
 
 app.get('/', (req, res) => {
+    console.log('Root requested');
     res.send('Roku ECP emulation server');
 });
 
@@ -77,11 +78,41 @@ app.listen(port, () => {
     console.log(`Roku ECP server listening at http://${hostIp}:${port}`);
 });
 
+const { networkInterfaces } = require('os');
+
+app.get('/query/device-info', (req, res) => {
+    console.log('Device info requested');
+    const nets = networkInterfaces();
+    const mac = nets.eth0?.[0]?.mac || '00:00:00:00:00:00'; // Example
+
+    res.set('Content-Type', 'text/xml');
+    res.send(`
+        <device-info>
+            <model-name>Roku Bridge</model-name>
+            <serial-number>0123ABCD</serial-number>
+            <software-version>1.0.0</software-version>
+            <power-mode>PowerOn</power-mode>
+            <network-type>ethernet</network-type>
+            <mac-address>AA:BB:CC:DD:EE:FF</mac-address>
+        </device-info>
+    `);
+});
+
 app.get('/query/apps', (req, res) => {
     res.send(getAppResponse(apps));
 });
 
 let appIndex = 0;
+
+app.get('/query/active-app', (req, res) => {
+    console.log('Active app requested');
+    res.set('Content-Type', 'text/xml');
+    res.send(`
+        <active-app>
+            <app id="${appIndex}">${apps[appIndex] || 'None'}</app>
+        </active-app>
+    `);
+});
 
 app.post('/launch/:id', (req, res, next) => {
     appIndex = +req.params.id;
@@ -101,7 +132,7 @@ const SsdpServer = require('node-ssdp').Server;
 
 const ssdpServer = new SsdpServer({
     location: `http://${hostIp}:${port}/`,
-    udn: 'uuid:roku:ecp:my-roku-ecp-emulator', // Unique identifier for the device
+    udn: 'uuid:roku:ecp:P0A070000008', // Unique identifier for the device
     ssdpSig: 'Roku UPnP/1.0 MiniUPnPd/1.4', // Server signature to mimic a Roku device
     st: 'roku:ecp' // The service type Roku remotes will search for
 });
@@ -110,7 +141,7 @@ ssdpServer.addUSN('upnp:rootdevice');
 ssdpServer.addUSN('roku:ecp');
 
 ssdpServer.on('advertise-alive', (headers) => {
-    console.log('SSDP advertise-alive', headers.USN);
+    // console.log('SSDP advertise-alive', headers.USN);
 });
 
 ssdpServer.on('advertise-bye', (headers) => {
