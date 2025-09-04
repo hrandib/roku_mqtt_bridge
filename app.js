@@ -33,8 +33,11 @@ const deviceInfo = {
 };
 
 const config = ini.parse(fs.readFileSync(configFile, 'utf-8'));
-const apps = config.apps.split(' ');
-console.log("Defined apps: " + config.apps);
+const apps = [];
+apps[12]='Netflix';
+apps[13]='Prime';
+apps[837]='YouTube';
+// console.log("Defined apps: " + config.apps);
 
 const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://' + config.mqtt_broker);
@@ -124,7 +127,7 @@ app.listen(port, () => {
 });
 
 // --- State Management ---
-let appIndex = 0;
+let appIndex = 13;
 
 // =================================================================
 // --- ECP Command Handlers ---
