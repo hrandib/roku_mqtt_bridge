@@ -16,7 +16,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "ini": "^2.0.0",
+    "morgan": "^1.10.1",
     "mqtt": "^4.2.6",
-    "node-ssdp":"^4.0.1"
+    "node-ssdp": "^4.0.1"
   }
 }
